@@ -1,0 +1,31 @@
+@use './abstracts/fonts' as ff;
+@use './abstracts/colours' as cc;
+
+%listReset {
+  margin: 0;
+  padding: 0;
+}
+
+@mixin listItem {
+  > li {
+    @extend %listReset;
+
+    > a {
+      font-family: ff.$primary-paragraph;
+      font-weight: 500;
+    }
+  }
+}
+
+body > div#panel {
+  position: absolute;
+  top: 20%;
+  transform: translatey(-20%);
+
+  > ul {
+    @extend %listReset;
+    list-style-type: none;
+
+    @include listItem;
+  }
+}
