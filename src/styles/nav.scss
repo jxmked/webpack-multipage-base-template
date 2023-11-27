@@ -1,4 +1,5 @@
 @use './abstracts/fonts' as ff;
+@use './abstracts/colours' as cc;
 
 nav {
   position: fixed;
@@ -11,6 +12,7 @@ nav {
   box-sizing: border-box;
   padding: 1rem;
   display: flex;
+  color: cc.$aw-dd-gray-5;
 
   > h4 {
     place-self: center;

@@ -1,5 +1,8 @@
-import '../styles/fonts/open-sans/stylesheet.css';
-import '../styles/common.scss';
-import './index.scss';
+import '../common-import';
+import '../styles/index.scss';
 
-console.log('Page 333333');
+// this is empty so 
+//import './index.scss'; 
+
+
+console.log('Page Three is here');

@@ -1,4 +1,5 @@
 import './common-import';
 import './styles/index.scss';
 
-console.log('Index ???');
+
+console.log('Index Page');
