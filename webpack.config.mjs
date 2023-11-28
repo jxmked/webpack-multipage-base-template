@@ -33,9 +33,7 @@ const CONFIG = {
 
   // Changing this during runtime will not going to parse it.
   // Restart the webpack to load
-  env: {
-    APP_VERSION: packageJson.version
-  },
+  env: {},
   windowResizeable: false,
 
   // Manifesting and information
@@ -113,7 +111,7 @@ export default function (env, config) {
     CONFIG.output.chunk = '[id]';
     prodPlugins.splice(0, prodPlugins.length);
   }
-  
+
   const DateToday = new Date().toISOString().substring(0, 10);
   const current_year = new Date().getFullYear();
 
@@ -125,6 +123,7 @@ export default function (env, config) {
   CONFIG.env.AUTHOR = packageJson.author;
   CONFIG.env.PROJECT_NAME = packageJson.name;
   CONFIG.env.BUILD_DATE = DateToday;
+  CONFIG.env.APP_VERSION = packageJson.version;
 
   const HTMLEntries = ENTRIES.pages.map(({ title, folder }) => {
     CONFIG.input.entry[title] = './' + path.join(CONFIG.input.dir, folder, 'index.ts');
@@ -262,6 +261,14 @@ export default function (env, config) {
     });
   });
 
+  /**
+   * This one wasnt efficient since if the port is taken, BrowserSyncPlugin will
+   * use other port and this one will remain unchanged.
+   * */
+  const DYNAMIC_HOMEPAGE_URL = devMode
+    ? `http://${ENTRIES.DEV_ADDR.host}:${ENTRIES.DEV_ADDR.port}`
+    : CONFIG.env.APP_HOMEPAGE;
+
   return {
     entry: CONFIG.input.entry,
     module: {
@@ -299,7 +306,7 @@ export default function (env, config) {
     output: {
       filename: CONFIG.output.name + '.js',
       chunkFilename: CONFIG.output.chunk + '.js',
-      path: path.resolve(path.join(__dirname,  CONFIG.output.dir)),
+      path: path.resolve(path.join(__dirname, CONFIG.output.dir)),
       clean: true
     },
     optimization: {
@@ -311,6 +318,18 @@ export default function (env, config) {
 
     plugins: [
       ...HTMLEntries,
+      new BrowserSyncPlugin({
+        host: ENTRIES.DEV_ADDR.host,
+        port: ENTRIES.DEV_ADDR.port,
+        server: {
+          baseDir: [CONFIG.output.dir]
+        },
+
+        files: ['./' + CONFIG.output.dir + '/*'],
+        notify: false,
+        ui: false, // Web UI for BrowserSyncPlugin
+        open: false // Open browser after initiation
+      }),
 
       new webpack.DefinePlugin({
         'process.env': Object.fromEntries(
@@ -324,19 +343,6 @@ export default function (env, config) {
         callPageView: true
       }),
 
-      new BrowserSyncPlugin({
-        host: 'localhost',
-        port: 3000,
-        server: {
-          baseDir: [CONFIG.output.dir]
-        },
-
-        files: ['./' + CONFIG.output.dir + '/*'],
-        notify: false,
-        ui: false, // Web UI for BrowserSyncPlugin
-        open: false // Open browser after initiation
-      }),
-
       new MiniCssExtractPlugin({
         filename: CONFIG.output.name + '.css',
         chunkFilename: CONFIG.output.chunk + '.css'
@@ -344,15 +350,22 @@ export default function (env, config) {
 
       new InterpolateHtmlPlugin({
         CDN: '',
-        PUBLIC_URL: ENTRIES.publicPath,
-        TITLE: CONFIG.appName,
-        APP_VERSION: packageJson.version,
+        PUBLIC_URL: DYNAMIC_HOMEPAGE_URL,
+        TITLE: CONFIG.env.APP_NAME,
         APP_MODE: devMode ? 'development' : 'production',
-        BASE_URL: packageJson.homepage,
+        BASE_URL: DYNAMIC_HOMEPAGE_URL,
         CURRENT_YEAR: current_year,
         CURRENT_DATE: DateToday,
-        APP_REPOSITORY: APP_REPOSITORY,
-        APP_TITLE_LENGTH: CONFIG.appName.length
+        APP_TITLE_LENGTH: CONFIG.env.APP_NAME.length,
+        APP_NAME: CONFIG.env.APP_NAME,
+        APP_SHORT_NAME: CONFIG.env.APP_SHORT_NAME,
+        APP_DESCRIPTION: CONFIG.env.APP_DESCRIPTION,
+        APP_HOMEPAGE: DYNAMIC_HOMEPAGE_URL,
+        APP_REPOSITORY: CONFIG.env.APP_REPOSITORY,
+        AUTHOR: CONFIG.env.AUTHOR,
+        PROJECT_NAME: CONFIG.env.PROJECT_NAME,
+        BUILD_DATE: CONFIG.env.BUILD_DATE,
+        APP_VERSION: CONFIG.env.APP_VERSION
       }),
 
       new CopyPlugin({

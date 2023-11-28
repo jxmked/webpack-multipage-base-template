@@ -30,7 +30,13 @@ const PWA = {
   background: '#3a3a3c'
 };
 
+const DEV_ADDR = {
+  host: 'localhost',
+  port: 3000
+};
+
 export default {
+  DEV_ADDR,
   pages,
   publicPath,
   appName,
