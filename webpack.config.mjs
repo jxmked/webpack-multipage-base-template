@@ -265,9 +265,9 @@ export default function (env, config) {
    * This one wasnt efficient since if the port is taken, BrowserSyncPlugin will
    * use other port and this one will remain unchanged.
    * */
-  const DYNAMIC_HOMEPAGE_URL = devMode
+  const DYNAMIC_HOMEPAGE_URL = (devMode
     ? `http://${ENTRIES.DEV_ADDR.host}:${ENTRIES.DEV_ADDR.port}`
-    : CONFIG.env.APP_HOMEPAGE;
+    : CONFIG.env.APP_HOMEPAGE).replace(/\/+$/ig, ""); // Remove / at the end
 
   return {
     entry: CONFIG.input.entry,
@@ -280,8 +280,8 @@ export default function (env, config) {
         },
         {
           test: /\.(jpe?g|png|gif|svg|webp)$/,
-          loader: 'file-loader'
-        },
+          type: 'asset/resource'
+        }, 
         {
           test: /\.(wav|mp3|mp4|avi|ogg)$/i,
           loader: 'file-loader'
@@ -318,18 +318,6 @@ export default function (env, config) {
 
     plugins: [
       ...HTMLEntries,
-      new BrowserSyncPlugin({
-        host: ENTRIES.DEV_ADDR.host,
-        port: ENTRIES.DEV_ADDR.port,
-        server: {
-          baseDir: [CONFIG.output.dir]
-        },
-
-        files: ['./' + CONFIG.output.dir + '/*'],
-        notify: false,
-        ui: false, // Web UI for BrowserSyncPlugin
-        open: false // Open browser after initiation
-      }),
 
       new webpack.DefinePlugin({
         'process.env': Object.fromEntries(
@@ -346,6 +334,19 @@ export default function (env, config) {
       new MiniCssExtractPlugin({
         filename: CONFIG.output.name + '.css',
         chunkFilename: CONFIG.output.chunk + '.css'
+      }),
+
+      new BrowserSyncPlugin({
+        host: ENTRIES.DEV_ADDR.host,
+        port: ENTRIES.DEV_ADDR.port,
+        server: {
+          baseDir: [CONFIG.output.dir]
+        },
+
+        files: ['./' + CONFIG.output.dir + '/*'],
+        notify: false,
+        ui: false, // Web UI for BrowserSyncPlugin
+        open: false // Open browser after initiation
       }),
 
       new InterpolateHtmlPlugin({
