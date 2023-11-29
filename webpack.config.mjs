@@ -115,10 +115,20 @@ export default function (env, config) {
   const DateToday = new Date().toISOString().substring(0, 10);
   const current_year = new Date().getFullYear();
 
+  /**
+   * This one wasnt efficient since if the port is taken, BrowserSyncPlugin will
+   * use other port and this one will remain unchanged.
+   * */
+  const DYNAMIC_HOMEPAGE_URL = (
+    devMode
+      ? `http://${ENTRIES.DEV_ADDR.host}:${ENTRIES.DEV_ADDR.port}`
+      : packageJson.homepage
+  ).replace(/\/+$/gi, ''); // Remove / at the end
+
   CONFIG.env.APP_NAME = CONFIG.appName;
   CONFIG.env.APP_SHORT_NAME = CONFIG.shortAppName;
   CONFIG.env.APP_DESCRIPTION = CONFIG.description;
-  CONFIG.env.APP_HOMEPAGE = packageJson.homepage;
+  CONFIG.env.APP_HOMEPAGE = DYNAMIC_HOMEPAGE_URL;
   CONFIG.env.APP_REPOSITORY = APP_REPOSITORY;
   CONFIG.env.AUTHOR = packageJson.author;
   CONFIG.env.PROJECT_NAME = packageJson.name;
@@ -260,16 +270,6 @@ export default function (env, config) {
       }
     });
   });
-
-  /**
-   * This one wasnt efficient since if the port is taken, BrowserSyncPlugin will
-   * use other port and this one will remain unchanged.
-   * */
-  const DYNAMIC_HOMEPAGE_URL = (
-    devMode
-      ? `http://${ENTRIES.DEV_ADDR.host}:${ENTRIES.DEV_ADDR.port}`
-      : CONFIG.env.APP_HOMEPAGE
-  ).replace(/\/+$/gi, ''); // Remove / at the end
 
   return {
     entry: CONFIG.input.entry,

@@ -1,9 +1,10 @@
+import { ENV } from './constants';
+import urlJoin from 'url-join';
+
 interface IPageData {
   page: string;
   href: string;
 }
-
-const currentPage = 'home';
 
 const pages = document.getElementById('page-data');
 
@@ -11,7 +12,7 @@ const createListItem = (args: IPageData): HTMLLIElement => {
   const li = document.createElement('li');
   const a = document.createElement('a');
 
-  a.setAttribute('href', args.href);
+  a.setAttribute('href', urlJoin(ENV.APP_HOMEPAGE, args.href));
   a.setAttribute('rel', 'noreferrer nofollow');
   a.appendChild(document.createTextNode(args.page));
 
