@@ -1,15 +1,24 @@
 const pages = [
+  // Keep this one for index page
   {
     title: 'index',
-    folder: ''
+    folder: '',
+    output_folder: ''
   },
   {
     title: 'pagetwo',
-    folder: 'pagetwo'
+    folder: 'pagetwo',
+    output_folder: 'pagetwo'
+  },
+  {
+    title: 'about-pagetwo',
+    folder: 'pagetwo/pagetwo-about',
+    output_folder: 'pagetwo/about'
   },
   {
     title: 'pagethree',
-    folder: 'pagethree'
+    folder: 'pagethree',
+    output_folder: 'pagethree'
   }
 ];
 

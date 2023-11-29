@@ -125,12 +125,12 @@ export default function (env, config) {
   CONFIG.env.BUILD_DATE = DateToday;
   CONFIG.env.APP_VERSION = packageJson.version;
 
-  const HTMLEntries = ENTRIES.pages.map(({ title, folder }) => {
+  const HTMLEntries = ENTRIES.pages.map(({ title, folder, output_folder }) => {
     CONFIG.input.entry[title] = './' + path.join(CONFIG.input.dir, folder, 'index.ts');
 
     return new HtmlWebpackPlugin({
       title: title,
-      filename: folder === '' ? 'index.html' : `${folder}/index.html`,
+      filename: output_folder === '' ? 'index.html' : `${output_folder}/index.html`,
       template: './' + path.join(CONFIG.input.dir, folder, `index.html`),
       //   manifest: './src/site.webmanifest',
       showErrors: devMode, // Include html error on emitted file
@@ -265,9 +265,11 @@ export default function (env, config) {
    * This one wasnt efficient since if the port is taken, BrowserSyncPlugin will
    * use other port and this one will remain unchanged.
    * */
-  const DYNAMIC_HOMEPAGE_URL = (devMode
-    ? `http://${ENTRIES.DEV_ADDR.host}:${ENTRIES.DEV_ADDR.port}`
-    : CONFIG.env.APP_HOMEPAGE).replace(/\/+$/ig, ""); // Remove / at the end
+  const DYNAMIC_HOMEPAGE_URL = (
+    devMode
+      ? `http://${ENTRIES.DEV_ADDR.host}:${ENTRIES.DEV_ADDR.port}`
+      : CONFIG.env.APP_HOMEPAGE
+  ).replace(/\/+$/gi, ''); // Remove / at the end
 
   return {
     entry: CONFIG.input.entry,
@@ -281,7 +283,7 @@ export default function (env, config) {
         {
           test: /\.(jpe?g|png|gif|svg|webp)$/,
           type: 'asset/resource'
-        }, 
+        },
         {
           test: /\.(wav|mp3|mp4|avi|ogg)$/i,
           loader: 'file-loader'
