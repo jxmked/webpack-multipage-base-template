@@ -1,0 +1,22 @@
+{
+  "index.css": "webpack-multipage-base-template/index.fa3f5d3175dcd87fd265.css",
+  "index.js": "webpack-multipage-base-template/index.52cb25e2d486fd75e25e.js",
+  "pagetwo.css": "webpack-multipage-base-template/pagetwo.fa3f5d3175dcd87fd265.css",
+  "pagetwo.js": "webpack-multipage-base-template/pagetwo.a27cb9a2bbfc95c4f613.js",
+  "about-pagetwo.css": "webpack-multipage-base-template/about-pagetwo.fa3f5d3175dcd87fd265.css",
+  "about-pagetwo.js": "webpack-multipage-base-template/about-pagetwo.0613f611b58553c6d77a.js",
+  "pagethree.css": "webpack-multipage-base-template/pagethree.fa3f5d3175dcd87fd265.css",
+  "pagethree.js": "webpack-multipage-base-template/pagethree.b14c6b64533903c98471.js",
+  "runtime.js": "webpack-multipage-base-template/runtime.9b76d34dd75260687bd1.js",
+  "OpenSans-Italic.woff": "webpack-multipage-base-template/ce5b13d0e95023056f6a.woff",
+  "OpenSans-Regular.woff": "webpack-multipage-base-template/20434f184d261c7abe57.woff",
+  "product-icon.png": "webpack-multipage-base-template/product-icon.png",
+  "OpenSans-Italic.woff2": "webpack-multipage-base-template/424c3e9f245be4b4ca1c.woff2",
+  "OpenSans-Regular.woff2": "webpack-multipage-base-template/50745f79a0d851b45c43.woff2",
+  "favicon.ico": "webpack-multipage-base-template/favicon.ico",
+  "pagetwo/index.html": "webpack-multipage-base-template/pagetwo/index.html",
+  "pagetwo/about/index.html": "webpack-multipage-base-template/pagetwo/about/index.html",
+  "pagethree/index.html": "webpack-multipage-base-template/pagethree/index.html",
+  "index.html": "webpack-multipage-base-template/index.html",
+  "404.html": "webpack-multipage-base-template/404.html"
+}
