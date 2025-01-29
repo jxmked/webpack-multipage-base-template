@@ -35,8 +35,4 @@ Open `entries.mjs` file and add your pages in `pages` constant.
 - [webpack-base-template](https://github.com/jxmked/webpack-base-template)
 - [webpack-multipage-base-template](https://github.com/jxmked/webpack-multipage-base-template)
 
-#### Any questions?
-
-- email: jovandeguia@gmail.com
-- FB: fb.com/deguia25
-- IG: instagram.com/jxmked
+#### **Created with love and frustration** by [Jovan](https://facebook.com/deguia25)
