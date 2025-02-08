@@ -1,12 +1,12 @@
 import url from 'url';
 import path from 'path';
+import fs from 'fs';
 import BrowserSyncPlugin from 'browser-sync-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import WebpackPwaManifest from 'webpack-pwa-manifest';
 import InterpolateHtmlPlugin from 'interpolate-html-plugin';
 import GA4WebpackPlugin from 'ga4-webpack-plugin';
-import packageJson from './package.json' assert { type: 'json' };
 import webpack from 'webpack';
 import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
 import CopyPlugin from 'copy-webpack-plugin';
@@ -18,6 +18,9 @@ dotenv.config();
 
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const __read_file__ = fs.readFileSync(path.join(__dirname, './package.json'), { encoding: "utf8" });
+const packageJson = JSON.parse(__read_file__);
 
 let devMode = process.env['NODE' + '_ENV'] !== 'production';
 const CONFIG = {
