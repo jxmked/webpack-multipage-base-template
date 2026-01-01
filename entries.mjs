@@ -44,6 +44,10 @@ const DEV_ADDR = {
   port: 3000
 };
 
+const MISC_CONF = {
+  windowResizeable: true
+}
+
 export default {
   DEV_ADDR,
   pages,
@@ -53,5 +57,6 @@ export default {
   GA4_MEASUREMENT_ID,
   SITE_NAME,
   PRODUCT_ICON,
-  PWA
+  PWA,
+  MISC_CONF
 };

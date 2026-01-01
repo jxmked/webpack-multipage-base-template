@@ -13,6 +13,8 @@ import CopyPlugin from 'copy-webpack-plugin';
 import HTMLMinifier from 'html-minifier';
 import dotenv from 'dotenv';
 import ENTRIES from './entries.mjs';
+import WorkboxPlugin from 'workbox-webpack-plugin';
+import entries from './entries.mjs';
 
 dotenv.config();
 
@@ -25,8 +27,12 @@ const packageJson = JSON.parse(__read_file__);
 let devMode = process.env['NODE' + '_ENV'] !== 'production';
 const CONFIG = {
   output: {
-    name: '[name].[contenthash]',
-    chunk: '[id].[contenthash]',
+    // We're having an issue with mismatch hash
+    // During build mode. Better to remove it "Pansamantagal"?
+    // name: '[name].[contenthash]',
+    // chunk: '[id].[contenthash]',
+    name: '[name]',
+    chunk: '[id]',
     dir: 'dist' // Do not include './' or '/'
   },
   input: {
@@ -37,7 +43,7 @@ const CONFIG = {
   // Changing this during runtime will not going to parse it.
   // Restart the webpack to load
   env: {},
-  windowResizeable: false,
+  windowResizeable: entries.MISC_CONF.windowResizeable,
 
   // Manifesting and information
 
@@ -79,7 +85,7 @@ const prodPlugins = [
 
     // Asset config
     fingerprints: false, // Remove hashed in filename
-    publicPath: './', // Make sure the url starts with
+    publicPath: '/', // Make sure the url starts with
     inject: true, // Insert html tag <link rel="manifest" ... />
     filename: 'site.webmanifest'
   }),
@@ -87,6 +93,12 @@ const prodPlugins = [
     basePath: '',
     publicPath: ENTRIES.publicPath,
     fileName: 'asset-manifest.json'
+  }),
+  new WorkboxPlugin.GenerateSW({
+    // these options encourage the ServiceWorkers to get in there fast
+    // and not allow any straggling "old" SWs to hang around
+    clientsClaim: true,
+    skipWaiting: true,
   })
 ];
 
@@ -151,8 +163,8 @@ export default function (env, config) {
       chunks: [title],
       meta: {
         'viewport':
-          'width=device-width, initial-scale=1, shrink-to-fit=no' +
-          (CONFIG.windowResizeable ? '' : ',user-scalable=no'),
+          'width=device-width, initial-scale=1, shrink-to-fit=no,user-scalable=' +
+          (CONFIG.windowResizeable ? 'yes' : 'no'),
         'robots': 'index,follow',
         'referrer': 'origin',
         'charset': { charset: 'UTF-8' },
@@ -164,7 +176,7 @@ export default function (env, config) {
           'http-equiv': 'X-UA-Compatible',
           'content': 'IE=edge'
         },
-        'color-scheme': 'light dark',
+        'color-scheme': 'light',
         'description': packageJson.description,
 
         // Extended
@@ -224,7 +236,7 @@ export default function (env, config) {
         },
         'apple-meta-03': {
           name: 'apple-touch-icon',
-          content: './favicon.ico'
+          content: '/favicon.ico'
         },
         'apple-meta-04': {
           name: 'apple-mobile-web-app-title',
@@ -296,7 +308,14 @@ export default function (env, config) {
           exclude: /node_modules/,
           use: [
             MiniCssExtractPlugin.loader,
-            'css-loader',
+            {
+              loader: 'css-loader',
+              options: {
+                url: {
+                  filter: url => !((/\.(jpe?g|png|gif|svg|webp)$/).test(url))
+                }
+              }
+            },
             'postcss-loader',
             'sass-loader'
           ]

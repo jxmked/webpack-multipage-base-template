@@ -9,7 +9,14 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'plugin:@typescript-eslint/recommended-requiring-type-checking'
   ],
-  overrides: [],
+  overrides: [
+    {
+      files: ["**/*.mjs", "**/*.cjs"],
+      parserOptions: {
+        project: null
+      }
+    }
+  ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 'latest',
