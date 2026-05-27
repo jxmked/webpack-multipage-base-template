@@ -10,18 +10,19 @@ import GA4WebpackPlugin from 'ga4-webpack-plugin';
 import webpack from 'webpack';
 import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
 import CopyPlugin from 'copy-webpack-plugin';
-import HTMLMinifier from 'html-minifier';
 import dotenv from 'dotenv';
 import ENTRIES from './entries.mjs';
 import WorkboxPlugin from 'workbox-webpack-plugin';
 import entries from './entries.mjs';
-
+import * as webpack_util from './webpack.util.mjs';
 dotenv.config();
 
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const __read_file__ = fs.readFileSync(path.join(__dirname, './package.json'), { encoding: "utf8" });
+const __read_file__ = fs.readFileSync(path.join(__dirname, './package.json'), {
+  encoding: 'utf8'
+});
 const packageJson = JSON.parse(__read_file__);
 
 let devMode = process.env['NODE' + '_ENV'] !== 'production';
@@ -93,14 +94,19 @@ const prodPlugins = [
     basePath: '',
     publicPath: ENTRIES.publicPath,
     fileName: 'asset-manifest.json'
-  }),
-  new WorkboxPlugin.GenerateSW({
-    // these options encourage the ServiceWorkers to get in there fast
-    // and not allow any straggling "old" SWs to hang around
-    clientsClaim: true,
-    skipWaiting: true,
   })
 ];
+
+if (entries.MISC_CONF.enabled_workoffline) {
+  prodPlugins.push(
+    new WorkboxPlugin.GenerateSW({
+      // these options encourage the ServiceWorkers to get in there fast
+      // and not allow any straggling "old" SWs to hang around
+      clientsClaim: true,
+      skipWaiting: true
+    })
+  );
+}
 
 /**
  * Handle App Repository Url
@@ -127,7 +133,7 @@ export default function (env, config) {
     prodPlugins.splice(0, prodPlugins.length);
   }
 
-  const DateToday = new Date().toISOString().substring(0, 10);
+  const iso_date_time = new Date().toISOString();
   const current_year = new Date().getFullYear();
 
   /**
@@ -147,7 +153,7 @@ export default function (env, config) {
   CONFIG.env.APP_REPOSITORY = APP_REPOSITORY;
   CONFIG.env.AUTHOR = packageJson.author;
   CONFIG.env.PROJECT_NAME = packageJson.name;
-  CONFIG.env.BUILD_DATE = DateToday;
+  CONFIG.env.BUILD_DATE = iso_date_time.substring(0, 10);
   CONFIG.env.APP_VERSION = packageJson.version;
 
   const HTMLEntries = ENTRIES.pages.map(({ title, folder, output_folder }) => {
@@ -196,7 +202,10 @@ export default function (env, config) {
         },
         'og:url': {
           property: 'og:url',
-          content: packageJson.homepage
+          content:
+            entries.MISC_CONF.OG_URL === false
+              ? packageJson.homepage
+              : entries.MISC_CONF.OG_URL
         },
         'og:type': {
           property: 'og:type',
@@ -227,7 +236,7 @@ export default function (env, config) {
           content: 'no'
         },
         'apple-meta-01': {
-          name: 'apple-mobile-web-app-capable',
+          name: 'mobile-web-app-capable',
           content: 'yes'
         },
         'apple-meta-02': {
@@ -241,10 +250,6 @@ export default function (env, config) {
         'apple-meta-04': {
           name: 'apple-mobile-web-app-title',
           content: CONFIG.appName
-        },
-        'apple-meta-05': {
-          name: 'apple-mobile-web-app-capable',
-          content: 'yes'
         },
         'tel-meta': {
           name: 'format-detection',
@@ -272,15 +277,15 @@ export default function (env, config) {
         },
         'date': {
           name: 'date',
-          content: DateToday
+          content: iso_date_time.toString()
         },
         'dcterms.created': {
           name: 'dcterms.created',
-          content: DateToday
+          content: iso_date_time.toString()
         },
         'dcterms.modified': {
           name: 'dcterms.modified',
-          content: DateToday
+          content: iso_date_time.toString()
         }
       }
     });
@@ -312,7 +317,7 @@ export default function (env, config) {
               loader: 'css-loader',
               options: {
                 url: {
-                  filter: url => !((/\.(jpe?g|png|gif|svg|webp)$/).test(url))
+                  filter: (url) => !/\.(jpe?g|png|gif|svg|webp)$/.test(url)
                 }
               }
             },
@@ -380,7 +385,7 @@ export default function (env, config) {
         APP_MODE: devMode ? 'development' : 'production',
         BASE_URL: DYNAMIC_HOMEPAGE_URL,
         CURRENT_YEAR: current_year,
-        CURRENT_DATE: DateToday,
+        CURRENT_DATE: iso_date_time.substring(0, 10),
         APP_TITLE_LENGTH: CONFIG.env.APP_NAME.length,
         APP_NAME: CONFIG.env.APP_NAME,
         APP_SHORT_NAME: CONFIG.env.APP_SHORT_NAME,
@@ -399,22 +404,13 @@ export default function (env, config) {
             from: 'public/',
             transform: {
               transformer(content, absoluteFrom) {
-                if (!absoluteFrom.endsWith('.html')) return content;
+                if (absoluteFrom.endsWith('.html')) {
+                  return webpack_util.html_minifier(content, absoluteFrom);
+                } else if (absoluteFrom.endsWith('.json')) {
+                  return webpack_util.json_minifier(content, absoluteFrom);
+                }
 
-                content = new Buffer(content).toString('utf8');
-
-                const minified = HTMLMinifier.minify(content, {
-                  html5: true,
-                  keepClosingSlash: true,
-                  minifyCSS: true,
-                  quoteCharacter: '"',
-                  removeComments: true,
-                  minifyJS: true,
-                  removeTagWhitespace: true,
-                  caseSensitive: true
-                });
-
-                return Buffer.from(minified);
+                return content;
               }
             }
           }
